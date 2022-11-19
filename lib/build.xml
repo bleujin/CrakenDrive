@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<project name="Jar Publish" default="gdrive_fat" basedir=".">
+	
+	<property name="baseDir" value="." />
+	<property name="binDir" value="./bin" />
+	<property name="publishDir" value="./publish" />
+	<tstamp>
+	  <format property="TODAY_MY" pattern="MM/dd/yyyy hh:mm"/>
+	</tstamp>
+	
+	
+	<property name="manifest.main.class" value="" />
+	<property name="manifest.classpath" value="./" />
+	<property name="version.number" value="0"/>
+	<property name="build.number" value="2"/>
+
+	<target name="gdrive_fat">
+		<jar destfile="../lib/gdrive_fat.jar">
+		    <zipgroupfileset dir="../resource/gdrive_lib" includes="*.jar"/>
+			<!--elsa, kotlin-runtime, kotlin-stdlib, lz4, mapdb -->
+		</jar>
+	</target>
+
+	<target name="gdrive_util_fat">
+		<jar destfile="../lib/gdrive_util_fat.jar">
+		    <zipgroupfileset dir="../resource/gdrive_util" includes="*.jar"/>
+			<!--elsa, kotlin-runtime, kotlin-stdlib, lz4, mapdb -->
+		</jar>
+	</target>
+
+</project>

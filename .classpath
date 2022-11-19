@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="lib/iframework_2.5.jar"/>
+	<classpathentry kind="lib" path="lib/apache_extend_fat.jar"/>
+	<classpathentry kind="lib" path="lib/gdrive_fat.jar"/>
+	<classpathentry kind="lib" path="lib/gdrive_util_fat.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
