@@ -2,19 +2,14 @@ package net.bleujin.google.gdrive;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URL;
-import java.util.Iterator;
 import java.util.List;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Files;
 import com.google.api.services.drive.model.File;
 
-import net.bleujin.fn.ExceptionFunction;
+import net.bleujin.fn.Fn;
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
 
@@ -119,7 +114,7 @@ public class GFile {
 		List<String> parents = ifile.getParents();
 		if (parents == null || parents.size() == 0) return ListUtil.EMPTY ;
 		
-		return parents.stream().map(wrap(pid -> gdrive().id(pid))).collect(Collectors.toList());
+		return parents.stream().map(Fn.wrap(pid -> gdrive().id(pid))).collect(Collectors.toList());
 	}
 
 	public boolean copyTo(GFile parent) throws IOException {
@@ -181,15 +176,6 @@ public class GFile {
 	}
 	
 
-	public static <T, R> Function<T, R> wrap(ExceptionFunction<T, R> f) {
-		return (T r) -> {
-			try {
-				return f.apply(r);
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
-		};
-	}
 
 	public GFile consume() throws IOException {
 		this.ifile = drive().files().get(id()).setFields("*").execute() ;
