@@ -19,7 +19,7 @@ public class TestFirst {
 
 	@BeforeEach
 	void setUp() throws GeneralSecurityException, IOException {
-		this.root = GBuilder.login("bleujin").root() ;
+		this.root = GBuilder.create().root("bleujin") ;
 	}
 	
 	

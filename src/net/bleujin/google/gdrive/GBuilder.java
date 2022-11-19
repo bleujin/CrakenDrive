@@ -25,30 +25,25 @@ import com.google.common.collect.Lists;
 
 public class GBuilder {
 
-	private static final String APPLICATION_NAME = "CrakenDrive";
+	private String applicationName = "CrakenDrive";
+	private String tokenPath = "./resource/apikey";
+
+	private String credentialFile = "./resource/apikey/credentials.json";
+
 	private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-	private static final String TOKENS_DIRECTORY_PATH = "tokens";
-
 	private static final List<String> SCOPES = Lists.newArrayList(DriveScopes.DRIVE_METADATA_READONLY, DriveScopes.DRIVE_FILE, Oauth2Scopes.USERINFO_PROFILE);
-	private static final String CREDENTIALS_FILE_PATH = "./resource/apikey/credentials.json";
-
-	private final String user;
-	public GBuilder(String user) {
-		this.user = user ;
-	}
-
 
 	private Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT, String user) throws IOException {
 		// Load client secrets.
-		InputStream in = new FileInputStream(CREDENTIALS_FILE_PATH);
+		InputStream in = new FileInputStream(credentialFile);
 		if (in == null) {
-			throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
+			throw new FileNotFoundException("Resource not found: " + credentialFile);
 		}
 		GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
 
 		// Build flow and trigger user authorization request.
 		GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-				.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
+				.setDataStoreFactory(new FileDataStoreFactory(new java.io.File(tokenPath)))
 //				.addRefreshListener(new CredentialRefreshListener() {
 //					@Override
 //					public void onTokenResponse(Credential arg0, TokenResponse arg1) throws IOException {
@@ -66,15 +61,29 @@ public class GBuilder {
 		// returns an authorized Credential object.
 		return credential;
 	}
-	
 
-	public static GBuilder login(String user) {
-		return new GBuilder(user);
+	public GBuilder applicationName(String applicationName) {
+		this.applicationName = applicationName ;
+		return this ;
+	}
+	
+	public GBuilder tokenPath(String tokenPath) {
+		this.tokenPath = tokenPath ;
+		return this ;
+	}
+	
+	public GBuilder credentialFile(String credentialFile) {
+		this.credentialFile = credentialFile ;
+		return this ;
 	}
 
-	public GFile root() throws GeneralSecurityException, IOException {
+	public static GBuilder create() {
+		return new GBuilder();
+	}
+
+	public GFile root(String user) throws GeneralSecurityException, IOException {
 		final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-		Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, user)).setApplicationName(APPLICATION_NAME).build();
+		Drive service = new Drive.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT, user)).setApplicationName(applicationName).build();
 		
 		return new GFile(new GDrive(service), service.files().get("root").execute(), false) ;
 	}

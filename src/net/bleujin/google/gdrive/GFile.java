@@ -75,6 +75,11 @@ public class GFile {
 		return gdrive.list(this);
 	}
 
+	public List<GFile> listFiles(String fields) throws IOException {
+		return gdrive.list(this, fields);
+	}
+
+	
 	public List<String> listNames() throws IOException {
 		return listFiles().stream().map(gfile -> gfile.getName()).collect(Collectors.toList());
 	}

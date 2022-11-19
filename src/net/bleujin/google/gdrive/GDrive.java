@@ -14,18 +14,35 @@ import com.google.api.services.drive.model.FileList;
 
 import net.ion.framework.util.Debug;
 import net.ion.framework.util.ListUtil;
+import net.ion.framework.util.StringUtil;
 
 public class GDrive {
 
-	private static final String defaultFields = "id,name,mimeType,parents,size,modifiedTime,webContentLink";
-	private static final String defaultFieldsItems = "files(" + defaultFields + ")";
+	public static final String Default_Fields = "id,name,mimeType,parents,size,modifiedTime,webContentLink";
 
 	private Drive drive;
+	private String defaultFields;
 
 	public GDrive(Drive drive) {
 		this.drive = drive;
+		this.defaultFields = Default_Fields ;
 	}
 
+	public GDrive defaultFields(String defaultFields) {
+		this.defaultFields = defaultFields ;
+		return this ;
+	}
+	
+	public GDrive allFields() {
+		this.defaultFields = "*" ;
+		return this ;
+	}
+	
+	public String defaultFieldsItems() {
+		return "files(" + defaultFields + ")"; 
+	}
+	
+	
 	public boolean exists(GFile parent, String name) throws IOException {
 		return child(parent, name) != null;
 	}
@@ -37,9 +54,9 @@ public class GDrive {
 	public List<GFile> list(String query, String fields, boolean includeTrashed) throws IOException {
 		Drive.Files.List list = drive.files().list();
 
-		if (fields != null)
+		if (StringUtil.isNotBlank(fields))
 			list.setFields(fields);
-		if (query != null)
+		if (StringUtil.isNotBlank(query))
 			list.setQ(query);
 		if (!includeTrashed)
 			list.setQ(query + (query != null ? " AND" : "") + " trashed = false");
@@ -65,7 +82,7 @@ public class GDrive {
 
 	public GFile child(GFile parent, String name) {
 		try {
-			return first("'" + parent.id() + "' in parents AND name = '" + name + "'", defaultFieldsItems, false);
+			return first("'" + parent.id() + "' in parents AND name = '" + name + "'", defaultFieldsItems(), false);
 		} catch (IOException e) {
 			return null;
 		}
@@ -79,7 +96,11 @@ public class GDrive {
 	}
 
 	public List<GFile> list(GFile parent) throws IOException {
-		return list("'" + parent.id() + "' in parents", defaultFieldsItems, false);
+		return list(parent, defaultFieldsItems());
+	}
+
+	public List<GFile> list(GFile parent, String fields) throws IOException {
+		return list("'" + parent.id() + "' in parents", fields, false);
 	}
 
 	public GFile create(GFile parent, String childName) throws IOException {
@@ -125,7 +146,7 @@ public class GDrive {
 
 	
 	public List<GFile> sharedWithMe() throws IOException {
-		com.google.api.services.drive.Drive.Files.List list = drive.files().list().setFields(defaultFieldsItems) ;
+		com.google.api.services.drive.Drive.Files.List list = drive.files().list().setFields(defaultFieldsItems()) ;
 		
 		return list.execute().getFiles().stream().filter(file -> file.getParents() == null).map(ifile -> new GFile(this, ifile, false)).collect(Collectors.toList()) ;
 	}
